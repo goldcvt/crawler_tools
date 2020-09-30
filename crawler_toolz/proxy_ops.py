@@ -1,10 +1,10 @@
 from crawler_toolz import db_ops
 import datetime
-import logging
-
-logging.basicConfig(level=logging.DEBUG, format='%(message)s')
-logger = logging.getLogger()
-logger.addHandler(logging.FileHandler('~/test.log', 'a'))
+# import logging
+#
+# logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+# logger = logging.getLogger()
+# logger.addHandler(logging.FileHandler('~/test.log', 'a'))
 
 
 
@@ -26,14 +26,14 @@ class Proxy:
 			self.type = "socks5"
 		else:
 			self.type = "nonsense"
-			logger.debug("Could not define proxy's type")
+			# logger.debug("Could not define proxy's type")
 
 	def get_address(self):
 		self.define_type()
 		if self.auth_data == '""':
 			return f"{self.type}://{self.domain}:{self.port}"
 		else:
-			logger.debug("Внезапно! Требуется авторизация. Такого мы не ожидали")
+			# logger.debug("Внезапно! Требуется авторизация. Такого мы не ожидали")
 			return ""
 
 	def blacklist(self, connection):
@@ -62,7 +62,7 @@ class Proxy:
 			try:
 				return True
 			except Exception as e:
-				logger.debug("Fucked up while deleting")
+				# logger.debug("Fucked up while deleting")
 				raise e
 		else:
 			return False
