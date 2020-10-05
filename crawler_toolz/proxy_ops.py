@@ -116,7 +116,7 @@ class Proxy:
 		port = "".join(address.split(":")[2])
 		list_proxy = db_ops.read_from_db(connection, "proxies", "id", "raw_protocol", "auth_data",
 										  "domain", "port", "response_time",
-										  where = "domain={} AND port = {} AND raw_protocol=0".format(domain, port),
+										  where = "domain='{}' AND port = {} AND raw_protocol=0".format(domain, port),
 										  order_by = "response_time", limit=1)[0][0].translate(
 				str.maketrans("a", "a", "()")).split(",")
 		proxy = Proxy(list_proxy[0], list_proxy[1], list_proxy[2], list_proxy[3], list_proxy[4], list_proxy[5])
