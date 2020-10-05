@@ -73,19 +73,20 @@ class Proxy:
 		conn = connection
 		curr_proxy = db_ops.read_from_db(conn, "proxies", 'id', 'raw_protocol', 'auth_data',
 										 'domain', 'port', 'response_time',
-										 where="random() < 0.01 AND number_of_bad_checks = {} AND raw_protocol = {}"
+										 where="random() < 0.01 AND number_of_bad_checks = {} AND raw_protocol = {} AND"
+											   " id NOT IN (SELECT proxy_db_id FROM banned_by_yandex)"
 										 .format(bad_checks, raw_protocol),
 										 limit=1)[0][0].translate(
 				str.maketrans("a", "a", "()")).split(",")
 		if curr_proxy:
 			proxy = Proxy(curr_proxy[0], curr_proxy[1], curr_proxy[2], curr_proxy[3], curr_proxy[4], curr_proxy[5])
-			while proxy.is_blacklisted(conn):
-				curr_proxy = db_ops.read_from_db(conn, "proxies", 'id', 'raw_protocol', 'auth_data',
-												 'domain', 'port', 'response_time',
-												 where="random() < 0.01 AND number_of_bad_checks = {} AND raw_protocol = {}"
-												 .format(bad_checks, raw_protocol),
-												 limit=1)[0][0].translate(
-						str.maketrans("a", "a", "()")).split(",")
+			# while proxy.is_blacklisted(conn):
+			# 	curr_proxy = db_ops.read_from_db(conn, "proxies", 'id', 'raw_protocol', 'auth_data',
+			# 									 'domain', 'port', 'response_time',
+			# 									 where="random() < 0.01 AND number_of_bad_checks = {} AND raw_protocol = {}"
+			# 									 .format(bad_checks, raw_protocol),
+			# 									 limit=1)[0][0].translate(
+			# 			str.maketrans("a", "a", "()")).split(",")
 		return proxy
 
 	@staticmethod
@@ -94,18 +95,18 @@ class Proxy:
 		proxy = None
 		list_proxy = db_ops.read_from_db(conn, "proxies", "id", "raw_protocol", "auth_data",
 										  "domain", "port", "response_time",
-										  where="number_of_bad_checks={} AND raw_protocol={}".format(bad_checks,
-																									 raw_protocol),
+										  where="number_of_bad_checks={} AND raw_protocol={} AND id NOT IN "
+												"(SELECT proxy_db_id FROM banned_by_yandex)"
+										 .format(bad_checks, raw_protocol),
 										  order_by="response_time", limit=1)[0][0].translate(
 				str.maketrans("a", "a", "()")).split(",")
-		# TODO а что если раньше были плохие проверки, а щас норм?)
+		# DONE TODO а что если раньше были плохие проверки, а щас норм?)
 		if list_proxy:
 			proxy = Proxy(list_proxy[0], list_proxy[1], list_proxy[2], list_proxy[3], list_proxy[4],
 						  list_proxy[5])
-			while proxy.is_blacklisted(conn):
-				proxy = Proxy.get_random_proxy(conn, raw_protocol, bad_checks)
-				# TODO переписать на более интеллектуальный запрос, чтобы прочекивало в БД с условием нахождения в
-				# другой таблице
+			# while proxy.is_blacklisted(conn):
+			# 	proxy = Proxy.get_random_proxy(conn, raw_protocol, bad_checks)
+			# 	# DONE TODO переписать на более интеллектуальный запрос
 		return proxy
 
 	@staticmethod
