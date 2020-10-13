@@ -98,7 +98,7 @@ class Proxy:
 										  where="number_of_bad_checks={} AND raw_protocol={} AND id NOT IN "
 												"(SELECT proxy_db_id FROM banned_by_yandex)"
 										 .format(bad_checks, raw_protocol),
-										  order_by="response_time", limit=1)[0][0].translate(
+										  order_by="last_check_time DESC,response_time", limit=1)[0][0].translate(
 				str.maketrans("a", "a", "()")).split(",")
 		# DONE TODO а что если раньше были плохие проверки, а щас норм?)
 		if list_proxy:
